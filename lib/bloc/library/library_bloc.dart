@@ -28,7 +28,8 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     emit(const LibraryLoading());
 
     try {
-      // Fetch initial bulk of pages (10 pages = ~500 tracks for fast start)
+      // Fetch initial bulk of pages for fast start.
+      // With playlist-based fetching, each page can yield 50-100 tracks.
       await _repository.fetchBulk(10);
 
       final allTracks = _repository.allTracks;
@@ -42,8 +43,28 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
         totalLoaded: _repository.totalTracks,
       ));
 
-      // Continue loading more in background (non-blocking)
-      _loadMoreInBackground(emit);
+      // Continue loading more in background within the same emitter scope.
+      // This keeps the emitter valid since we're still inside the handler.
+      for (int i = 0; i < 20 && _repository.hasMore; i++) {
+        try {
+          await _repository.fetchBulk(5);
+        } catch (_) {
+          break;
+        }
+
+        final currentState = state;
+        if (currentState is LibraryLoaded && currentState.searchQuery.isEmpty) {
+          final updatedTracks = _repository.allTracks;
+          final updatedGrouped = MusicRepository.groupTracks(updatedTracks);
+          emit(currentState.copyWith(
+            allTracks: updatedTracks,
+            displayTracks: updatedTracks,
+            groupedTracks: updatedGrouped,
+            totalLoaded: _repository.totalTracks,
+            hasMore: _repository.hasMore,
+          ));
+        }
+      }
     } on NoInternetException {
       emit(const LibraryError(
         message: 'NO INTERNET CONNECTION',
@@ -51,33 +72,6 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
       ));
     } catch (e) {
       emit(LibraryError(message: e.toString()));
-    }
-  }
-
-  /// Background loading to accumulate tracks.
-  Future<void> _loadMoreInBackground(Emitter<LibraryState> emit) async {
-    // Load more pages gradually
-    for (int i = 0; i < 20 && _repository.hasMore; i++) {
-      if (state is! LibraryLoaded) return;
-
-      try {
-        await _repository.fetchBulk(5);
-      } catch (_) {
-        break;
-      }
-
-      final currentState = state;
-      if (currentState is LibraryLoaded && currentState.searchQuery.isEmpty) {
-        final allTracks = _repository.allTracks;
-        final grouped = MusicRepository.groupTracks(allTracks);
-        emit(currentState.copyWith(
-          allTracks: allTracks,
-          displayTracks: allTracks,
-          groupedTracks: grouped,
-          totalLoaded: _repository.totalTracks,
-          hasMore: _repository.hasMore,
-        ));
-      }
     }
   }
 
