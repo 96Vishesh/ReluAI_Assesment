@@ -43,11 +43,11 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
         totalLoaded: _repository.totalTracks,
       ));
 
-      // Continue loading more in background within the same emitter scope.
-      // This keeps the emitter valid since we're still inside the handler.
-      for (int i = 0; i < 20 && _repository.hasMore; i++) {
+      // Continue loading in background until we hit 55K+ target.
+      // Loop until hasMore is false (set when target is reached).
+      while (_repository.hasMore) {
         try {
-          await _repository.fetchBulk(5);
+          await _repository.fetchBulk(10);
         } catch (_) {
           break;
         }
