@@ -13,6 +13,7 @@ class FetchTrackDetails extends TrackDetailsEvent {
   final String artistName;
   final String albumName;
   final int duration;
+  final String? albumCoverUrl;
 
   const FetchTrackDetails({
     required this.trackId,
@@ -20,6 +21,7 @@ class FetchTrackDetails extends TrackDetailsEvent {
     required this.artistName,
     required this.albumName,
     required this.duration,
+    this.albumCoverUrl,
   });
 
   @override

@@ -25,6 +25,7 @@ class TrackDetailsScreen extends StatelessWidget {
           artistName: track.artistName,
           albumName: track.albumTitle,
           duration: track.duration,
+          albumCoverUrl: track.albumCoverMedium,
         )),
       child: _TrackDetailsBody(track: track),
     );
@@ -125,6 +126,7 @@ class _TrackDetailsBody extends StatelessWidget {
                               artistName: track.artistName,
                               albumName: track.albumTitle,
                               duration: track.duration,
+                              albumCoverUrl: track.albumCoverMedium,
                             ),
                           );
                     },

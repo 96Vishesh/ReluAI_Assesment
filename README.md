@@ -1,4 +1,4 @@
-# 🎵 Music Library – 50k+ Track Virtualization
+# 🎵 Music Library - 50k+ Track Virtualization
 
 A Flutter music library app that renders and interacts with **50,000+ tracks** smoothly using the **BLoC pattern**, with infinite scrolling, A-Z grouping with sticky headers, debounced search, and a details + lyrics screen.
 
@@ -6,9 +6,9 @@ A Flutter music library app that renders and interacts with **50,000+ tracks** s
 
 ### Library Screen
 - **50,000+ tracks** loaded via multi-query Deezer API paging
-- **Infinite scroll** with lazy loading — only visible items are built
+- **Infinite scroll** with lazy loading - only visible items are built
 - **A-Z sticky headers** grouping tracks by first letter
-- **Debounced search** (300ms) running on a background isolate — no UI freeze
+- **Debounced search** (300ms) running on a background isolate - no UI freeze
 - **Track count badge** showing real-time loaded count
 - **Scroll-to-top** floating action button
 
@@ -21,7 +21,7 @@ A Flutter music library app that renders and interacts with **50,000+ tracks** s
 
 ---
 
-## 🏗️ Architecture – BLoC Flow
+## 🏗️ Architecture - BLoC Flow
 
 ```
 ┌─────────────┐     Events      ┌──────────────┐     States      ┌────────────┐
@@ -58,7 +58,7 @@ A Flutter music library app that renders and interacts with **50,000+ tracks** s
 ### 1. Multi-Query Paging Strategy
 **Problem:** Deezer's search API returns max ~1000 results per query. To reach 50k+, a single query isn't enough.
 
-**Solution:** Rotate through 38 queries (`a`–`z`, `0`–`9`, plus common terms like "love", "night", "dance") × 40 pages each (50 items/page). Tracks are de-duplicated by ID in a `Map<int, Track>`, ensuring uniqueness. This yields 38 × 40 × 50 = 76,000 potential tracks (minus duplicates = 50k+ unique).
+**Solution:** Rotate through 38 queries (`a`-`z`, `0`-`9`, plus common terms like "love", "night", "dance") × 40 pages each (50 items/page). Tracks are de-duplicated by ID in a `Map<int, Track>`, ensuring uniqueness. This yields 38 × 40 × 50 = 76,000 potential tracks (minus duplicates = 50k+ unique).
 
 ### 2. Isolate-Based Search
 **Problem:** Filtering 50k+ items on the main thread would freeze the UI for 100-500ms.
@@ -68,7 +68,7 @@ A Flutter music library app that renders and interacts with **50,000+ tracks** s
 ### 3. Slivers for Virtualization (No Third-Party Packages)
 **Problem:** Cannot use third-party virtualization packages, but must render 50k+ items without building all widgets at once.
 
-**Solution:** `CustomScrollView` with `SliverList.builder` — Flutter's built-in lazy builder only creates widgets for items currently visible on screen (± a small cache extent). Combined with `SliverPersistentHeader(pinned: true)` for sticky A-Z headers, this gives full virtualization without any external packages.
+**Solution:** `CustomScrollView` with `SliverList.builder` - Flutter's built-in lazy builder only creates widgets for items currently visible on screen (± a small cache extent). Combined with `SliverPersistentHeader(pinned: true)` for sticky A-Z headers, this gives full virtualization without any external packages.
 
 ---
 
@@ -86,7 +86,7 @@ A Flutter music library app that renders and interacts with **50,000+ tracks** s
 At **100,000 items**, the following would become bottlenecks:
 
 1. **In-Memory Track Map**: The `Map<int, Track>` storing all tracks consumes ~100-150 MB at 100k. On low-end devices (1-2 GB RAM), this could trigger OOM kills.
-   - **Fix:** Implement a paginated virtual list backed by SQLite/Hive — only keep a window of ~5,000 tracks in memory at any time.
+   - **Fix:** Implement a paginated virtual list backed by SQLite/Hive - only keep a window of ~5,000 tracks in memory at any time.
 
 2. **Grouping Computation**: `MusicRepository.groupTracks()` iterates all 100k items to build the grouped map. At 100k, this takes 200-400ms even on an isolate.
    - **Fix:** Maintain an incrementally-updated sorted/grouped structure (e.g., a `SplayTreeMap`) instead of rebuilding from scratch on every change.
@@ -177,22 +177,30 @@ The app uses Flutter's built-in `SliverList.builder`, which only builds widgets 
 
 The track data (`Map<int, Track>`) grows linearly with items loaded, but the widget tree stays constant. Repeated scrolling and searching does **not** continuously grow memory because:
 1. Builder pattern creates/destroys widgets on demand
-2. Debounced search prevents isolate accumulation  
+2. Debounced search prevents isolate accumulation
 3. `CachedNetworkImage` manages its own LRU cache for album art
 
 ---
 
 ## 🛠️ Technologies Used
 
-- **Flutter 3.x** – Cross-platform UI
-- **flutter_bloc** – BLoC pattern state management
-- **http** – REST API calls
-- **connectivity_plus** – Network state monitoring
-- **equatable** – Value equality for BLoC events/states
-- **cached_network_image** – Efficient album art caching
+- **Flutter 3.x** - Cross-platform UI
+- **flutter_bloc** - BLoC pattern state management
+- **http** - REST API calls
+- **connectivity_plus** - Network state monitoring
+- **equatable** - Value equality for BLoC events/states
+- **cached_network_image** - Efficient album art caching
 
 ---
 
 ## 📝 AI Usage Disclosure
 
-This project was developed with assistance from AI tools (Gemini AI) for code generation, architecture planning, and documentation.
+This project was developed with assistance from AI tools (Claude AI) for code generation, architecture planning, and documentation.
+
+## Author
+
+Vishesh Srivastava
+
+created for ReluAI assesment
+
+Date : 13th February 2026

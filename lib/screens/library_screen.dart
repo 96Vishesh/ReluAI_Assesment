@@ -73,61 +73,62 @@ class _LibraryScreenState extends State<LibraryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          // Offline banner
-          BlocBuilder<ConnectivityBloc, ConnectivityState>(
-            builder: (context, state) {
-              if (state is ConnectivityOffline) {
-                return Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.only(
-                    top: MediaQuery.of(context).padding.top + 8,
-                    bottom: 8,
-                    left: 16,
-                    right: 16,
-                  ),
-                  decoration: const BoxDecoration(
-                    color: AppTheme.errorColor,
-                  ),
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.wifi_off_rounded, color: Colors.white, size: 18),
-                      SizedBox(width: 8),
-                      Text(
-                        'NO INTERNET CONNECTION',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }
-              return const SizedBox.shrink();
-            },
-          ),
-          // Main content
-          Expanded(
-            child: BlocBuilder<LibraryBloc, LibraryState>(
+      body: SafeArea(
+        bottom: false,
+        child: Column(
+          children: [
+            // Offline banner
+            BlocBuilder<ConnectivityBloc, ConnectivityState>(
               builder: (context, state) {
-                if (state is LibraryInitial || state is LibraryLoading) {
-                  return _buildLoadingState();
-                }
-                if (state is LibraryError) {
-                  return _buildErrorState(state);
-                }
-                if (state is LibraryLoaded) {
-                  return _buildLoadedState(state);
+                if (state is ConnectivityOffline) {
+                  return Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 8,
+                      horizontal: 16,
+                    ),
+                    decoration: const BoxDecoration(
+                      color: AppTheme.errorColor,
+                    ),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.wifi_off_rounded, color: Colors.white, size: 18),
+                        SizedBox(width: 8),
+                        Text(
+                          'NO INTERNET CONNECTION',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
                 }
                 return const SizedBox.shrink();
               },
             ),
-          ),
-        ],
+            // Main content
+            Expanded(
+              child: BlocBuilder<LibraryBloc, LibraryState>(
+                builder: (context, state) {
+                  if (state is LibraryInitial || state is LibraryLoading) {
+                    return _buildLoadingState();
+                  }
+                  if (state is LibraryError) {
+                    return _buildErrorState(state);
+                  }
+                  if (state is LibraryLoaded) {
+                    return _buildLoadedState(state);
+                  }
+                  return const SizedBox.shrink();
+                },
+              ),
+            ),
+          ],
+        ),
       ),
       floatingActionButton: _showScrollToTop
           ? FloatingActionButton(
@@ -233,84 +234,81 @@ class _LibraryScreenState extends State<LibraryScreen> {
       slivers: [
         // App bar with title
         SliverToBoxAdapter(
-          child: SafeArea(
-            bottom: false,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.library_music_rounded,
-                        color: AppTheme.primaryColor,
-                        size: 28,
-                      ),
-                      const SizedBox(width: 10),
-                      const Expanded(
-                        child: Text(
-                          'Music Library',
-                          style: TextStyle(
-                            color: AppTheme.textPrimary,
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: -0.5,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          gradient: AppTheme.headerGradient,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          '${_formatNumber(state.totalLoaded)} tracks',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  // Search bar
-                  TextField(
-                    controller: _searchController,
-                    onChanged: _onSearchChanged,
-                    style: const TextStyle(color: AppTheme.textPrimary),
-                    decoration: InputDecoration(
-                      hintText: 'Search tracks, artists, albums...',
-                      prefixIcon: const Icon(Icons.search_rounded),
-                      suffixIcon: _searchController.text.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(Icons.close_rounded),
-                              onPressed: _clearSearch,
-                            )
-                          : null,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.library_music_rounded,
+                      color: AppTheme.primaryColor,
+                      size: 28,
                     ),
-                  ),
-                  if (state.searchQuery.isNotEmpty) ...[
-                    const SizedBox(height: 10),
-                    Text(
-                      '${_formatNumber(state.displayTracks.length)} results for "${state.searchQuery}"',
-                      style: const TextStyle(
-                        color: AppTheme.textSecondary,
-                        fontSize: 13,
+                    const SizedBox(width: 10),
+                    const Expanded(
+                      child: Text(
+                        'Music Library',
+                        style: TextStyle(
+                          color: AppTheme.textPrimary,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: -0.5,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        gradient: AppTheme.headerGradient,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        '${_formatNumber(state.totalLoaded)} tracks',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ],
-                  const SizedBox(height: 8),
+                ),
+                const SizedBox(height: 16),
+                // Search bar
+                TextField(
+                  controller: _searchController,
+                  onChanged: _onSearchChanged,
+                  style: const TextStyle(color: AppTheme.textPrimary),
+                  decoration: InputDecoration(
+                    hintText: 'Search tracks, artists, albums...',
+                    prefixIcon: const Icon(Icons.search_rounded),
+                    suffixIcon: _searchController.text.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.close_rounded),
+                            onPressed: _clearSearch,
+                          )
+                        : null,
+                  ),
+                ),
+                if (state.searchQuery.isNotEmpty) ...[
+                  const SizedBox(height: 10),
+                  Text(
+                    '${_formatNumber(state.displayTracks.length)} results for "${state.searchQuery}"',
+                    style: const TextStyle(
+                      color: AppTheme.textSecondary,
+                      fontSize: 13,
+                    ),
+                  ),
                 ],
-              ),
+                const SizedBox(height: 8),
+              ],
             ),
           ),
         ),
