@@ -248,16 +248,19 @@ class _LibraryScreenState extends State<LibraryScreen> {
                         size: 28,
                       ),
                       const SizedBox(width: 10),
-                      const Text(
-                        'Music Library',
-                        style: TextStyle(
-                          color: AppTheme.textPrimary,
-                          fontSize: 26,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: -0.5,
+                      const Expanded(
+                        child: Text(
+                          'Music Library',
+                          style: TextStyle(
+                            color: AppTheme.textPrimary,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: -0.5,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      const Spacer(),
+                      const SizedBox(width: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 10,
